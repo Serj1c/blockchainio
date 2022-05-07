@@ -1,24 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"os"
+
 	"github.com/serj1c/blockchainio/blockchain"
-	"strconv"
+	cli2 "github.com/serj1c/blockchainio/cli"
 )
 
 func main() {
+	defer os.Exit(0)
 	chain := blockchain.InitBlockChain()
+	defer chain.Database.Close()
 
-	chain.AddBlock("second block")
-	chain.AddBlock("third block")
-
-	for _, block := range chain.Blocks {
-		fmt.Printf("Prev hash: %x\n", block.PrevHash)
-		fmt.Printf("Data: %s\n", block.Data)
-		fmt.Printf("Hash: %x\n", block.Hash)
-
-		pow := blockchain.NewProof(block)
-		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
-		fmt.Println() // for spacing
-	}
+	cli := cli2.CommandLine{Blockchain: chain}
+	cli.Run()
 }
